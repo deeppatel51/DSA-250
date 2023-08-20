@@ -18,11 +18,11 @@ void printPattern(int n)
             cout << j;
             j++;
         }
-        j=1;
-        while(j<=row-1)
+        j=row-1;
+        while(j)
         {
             cout << j;
-            j++;
+            j--;
         }
         space = n - row;
         while(space)
