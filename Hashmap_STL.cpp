@@ -8,6 +8,8 @@ int main()
     m.insert(make_pair(1,1));
     m.insert(make_pair(3,3));
     m.insert(make_pair(-1,-1));
+
+    cout << m.count(2) << endl << endl;
     // for(auto i: m)
     // {
     //     cout << i.second << endl;
