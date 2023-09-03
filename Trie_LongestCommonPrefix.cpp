@@ -1,75 +1,90 @@
+class TrieNode{
+    public:
+    char data;
+    TrieNode* children[26];
+    bool isTerminal;
+    int childcount;
+
+    TrieNode(char ch){
+        data = ch;
+        for(int i = 0 ; i < 26 ; i++){
+            children[i] = NULL;
+        }
+        isTerminal = false;
+        childcount = 0;
+    }
+};
+
 class Trie{
-private:
-    struct Node{
-        Node* links[26];
-        bool flag;
-        int cp = 0;
+    public:
+    TrieNode *root;
 
-        bool contains(char e){
-            return links[e-'a'] != NULL;
-        }
-
-        void add(char e,Node* node){
-            links[e-'a'] = node;
-        }
-
-        Node* next(char e){
-            return links[e-'a'];
-        }
-
-        void setend(){
-            this->flag = true;
-        }
-        void incresePrefix(){
-            this->cp++;
-        }
-    };
-private:
-    Node* root;
-public:
-    Trie(){
-        root = new Node();
+    Trie(char ch){
+        root = new TrieNode(ch);
     }
-    void insert(string&s){
-        Node* node = root;
-        for(char&e: s){
-            if(!node->contains(e))
-                node->add(e,new Node());
-            node = node->next(e);
-            node->incresePrefix();
-        }
-        node->setend();
+
+    void insertWord(string word){
+        insertUtil(root , word);
     }
-    int num_of_prefix(string&s){
-        Node* node = root;
-        for(char&e: s){
-            if(!node->contains(e)) return 0;
-            node = node->next(e);
+
+    void insertUtil(TrieNode *root , string word){
+        //base case
+        if(word.length() == 0){
+            root->isTerminal = true;
+            return ;
         }
-        return node->cp;
+
+        int index = word[0] - 'a';
+        TrieNode *child;
+
+        if(root->children[index] != NULL){
+            child = root->children[index];
+        }
+        else{
+            child = new TrieNode(word[0]);
+            root->children[index] = child;
+            root->childcount++;
+        }
+
+        //recursion
+        insertUtil(child , word.substr(1));
+    }
+
+    void lcp(string str , string &ans){
+        for(int i = 0 ; i < str.length() ; i++){
+            char ch = str[i];
+
+            if(root->childcount == 1){
+                ans += ch;
+                int index = ch - 'a';
+                root = root->children[index];
+            }
+            else{
+                break;
+            }
+
+            if(root->isTerminal == true)
+                break;
+        }
     }
 };
 
 class Solution {
 public:
     string longestCommonPrefix(vector<string>& strs) {
-        int n = size(strs), mn = 1e9;
-        Trie *trie = new Trie();
-        string s,t;
-        for(auto&e: strs){
-            if(size(e) < mn){
-                mn = size(e);
-                s = e;
-            }
-            trie->insert(e);
+        Trie *t = new Trie('\0');
+
+        for(int i = 0 ; i < strs.size() ; i++){
+            if(strs[i] == "")
+                return "";
+            else
+                t->insertWord(strs[i]);
         }
-        for(char&e: s){
-            t += e;
-            if(trie->num_of_prefix(t) != n){
-                t.pop_back();
-                return t;
-            }
-        }
-        return t;
+
+        string first = strs[0];
+        string ans = "";
+
+        t->lcp(first , ans);
+        return ans;
     }
 };
